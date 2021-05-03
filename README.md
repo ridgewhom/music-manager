@@ -4,7 +4,8 @@
 
 ## Preview Image (not representable of final version)
 
-![Preview Image](https://raw.githubusercontent.com/ridgewhom/music-manager/master/music-manager-alpha-img1.JPG | width = 80%)
+<img src="https://raw.githubusercontent.com/ridgewhom/music-manager/master/music-manager-alpha-img1.JPG" width=80%>
+
 
 Developed a desktop application using Electron and Vue.js for users to have an easier
 way to lookup music needed for a project, such as for making a video.
