@@ -1,8 +1,10 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+
+
 
 import './store'
 
@@ -15,9 +17,11 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+let win;
+
 async function createWindow() {
   // Create the browser window.
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1280,
     height: 720,
     webPreferences: {
@@ -85,3 +89,42 @@ if (isDevelopment) {
     })
   }
 }
+
+let defaultWebPreferences = {
+  webSecurity: false,
+  nodeIntegration: true,
+  contextIsolation: false,
+  enableRemoteModule: true
+}
+
+let preferencesWindow;
+
+ipcMain.on('showPreferences', function (e, data) {
+  if(!preferencesWindow){
+    const modalPath = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:8080/#/preferences'
+      : `file://${__dirname}/index.html#preferences`
+    preferencesWindow = new BrowserWindow({ 
+      width: 800, 
+      height: 400, 
+      webPreferences: defaultWebPreferences,
+      title: "Music-Manager Preferences",
+      parent: win
+    })
+    preferencesWindow.on('closed', function () { 
+      preferencesWindow = null 
+    });
+    preferencesWindow.on('page-title-updated', function(e) {
+      e.preventDefault()
+    });
+    preferencesWindow.loadURL(modalPath)
+
+  }
+  else {
+    preferencesWindow.show()
+  }
+})
+
+ipcMain.on('vuex-update', (event, arg) => {
+  win.send('vuex-update',arg);
+})

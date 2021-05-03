@@ -14,12 +14,11 @@
             type="warning"
             message="Are you sure you want to remove ALL files?">Clear Files</confirmation-button>
           <button class="dropdown-item" @click="toggleSelectRemove">Select And Remove Files</button>
+          <open-window-button class="dropdown-item" ipc-channel="showPreferences">Preferences</open-window-button>
         </div>
       </div>
     </dropdown-menu>
-    <!--base-file-input name="Add Music File(s)" :multiple="true" v-on:input="handleFiles"  accept="audio/*"/>
-    <Button @click="clearFiles()">Clear Files</Button>
-    <confirmation-button text="Clear Files" message="Are you sure you want to clear ALL files?" v-on:confirmation-accepted="clearFiles"></confirmation-button-->
+
     <div id = "zoom-toggle">
       <Button id = "zoom-button" @click="zoom = !zoom; minPxPerSec = zoom ? copyMinPx : '0';">Toggle Zoom</Button>
       <input id = "min-px-input"  type="number" min="0" step="1" v-if="zoom" v-model="minPxPerSec" placeholder="Px/Sec">
@@ -27,7 +26,6 @@
     <input v-model.trim="nameFilter" placeholder="Filter By Name">
     <input v-model.trim="artistFilter" placeholder="Filter By Artist">
     <input v-model.trim="genreFilter" placeholder="Filter By Genre">
-    <!--div id = statusMessageField ref="statusMessageField"><b>{{statusMessage}}</b></div-->
     <input type="range" title="Global Volume" id=volume min="0" max="100" @input="setGlobalVolume($event.target.value * .01)"/>
 
   </div>
@@ -35,21 +33,21 @@
 
 <script>
 import BaseFileInput from './Base-Components/BaseFileInput.vue';
-//import BaseButton from '@/components/Base-Components/BaseButton.vue'
 import { mapActions} from 'vuex'
 import * as mm from 'music-metadata';
 import _ from 'lodash';
 import ConfirmationButton from './ConfirmationButton.vue';
 import DropdownMenu from '@innologica/vue-dropdown-menu'
+import OpenWindowButton from './OpenWindowButton.vue'
 
-//const util = require('util');
 
 export default {
   name: 'ToolBar',
   components: {
     BaseFileInput,
     ConfirmationButton,
-    DropdownMenu
+    DropdownMenu,
+    OpenWindowButton
   },
   data: () => ({
         statusMessage : 'Status Messages Are Displayed Here',
@@ -155,11 +153,13 @@ export default {
 
 <style scoped>
     .toolbar{
-        display: grid;
-        grid-template-columns: 75px minmax(150px,2fr) minmax(50px,3fr)  minmax(50px,3fr) minmax(50px,2fr)  minmax(100px,1fr);
-        grid-template-rows: 100%;
-        grid-gap: 0;
-        z-index: 10;
+      display: grid;
+      grid-template-columns: 75px minmax(150px,2fr) minmax(50px,3fr)  minmax(50px,3fr) minmax(50px,2fr)  minmax(100px,1fr);
+      grid-template-rows: 100%;
+      grid-gap: 0;
+      z-index: 10;
+      background-color: #3c3c3c;
+
     }
     button{
       text-overflow:ellipsis;

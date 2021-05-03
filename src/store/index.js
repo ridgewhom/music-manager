@@ -1,10 +1,10 @@
-import Vue from "vue"
-import Vuex from "vuex"
+import Vue from 'vue'
+import Vuex from 'vuex'
 
 import _ from 'lodash';
 
-import { createPersistedState } from "vuex-electron"
-//import { createPersistedState, createSharedMutations } from "vuex-electron"
+import { createPersistedState } from 'vuex-electron'
+//import { createPersistedState, createSharedMutations } from 'vuex-electron'
 
 
 Vue.use(Vuex)
@@ -18,56 +18,60 @@ export default new Vuex.Store({
       globalVolume: 1,
       minPxPerSec: 0,
       selectRemoveEnable: false,
+      rowHeight: 128,
     },
   
     actions: {
       pushFile(store,file){
-        store.commit("PUSH_FILE",file);
+        store.commit('PUSH_FILE',file);
       },
       clearFiles(store){
-        store.commit("CLEAR_FILES");
+        store.commit('CLEAR_FILES');
       },
       removeFile(store,filePath){
-        store.commit("REMOVE_FILE",filePath)
+        store.commit('REMOVE_FILE',filePath)
       },
       setGlobalVolume(store,volume){
-        store.commit("SET_GLOBAL_VOLUME",volume);
+        store.commit('SET_GLOBAL_VOLUME',volume);
         //console.log(volume)
       },
       setNameFilter(store,name){
         //console.log(name);
-        store.commit("SET_NAME_FILTER",name);
+        store.commit('SET_NAME_FILTER',name);
       },
       setGenreFilter(store,genre){
-        store.commit("SET_GENRE_FILTER",genre);
+        store.commit('SET_GENRE_FILTER',genre);
       },
       setArtistFilter(store,artist){
-        store.commit("SET_ARTIST_FILTER",artist);
+        store.commit('SET_ARTIST_FILTER',artist);
       },
       setMinPxPerSec(store,minPxPerSec){
-        store.commit("SET_MIN_PX_PER_SEC",minPxPerSec);
+        store.commit('SET_MIN_PX_PER_SEC',minPxPerSec);
       },
       addRegion(store,{region,file}){
-        store.commit("ADD_REGION",{region,file});
+        store.commit('ADD_REGION',{region,file});
       },
       removeRegion(store,{region,file}){
-        store.commit("REMOVE_REGION",{region,file});
+        store.commit('REMOVE_REGION',{region,file});
       },
       clearRegions(store,file){
-        store.commit("CLEAR_REGIONS",file);
+        store.commit('CLEAR_REGIONS',file);
       },
       toggleSelectRemove(store){
-        store.commit("TOGGLE_SELECT_REMOVE");
+        store.commit('TOGGLE_SELECT_REMOVE');
+      },
+      setRowHeight(store,rowHeight){
+        store.commit('SET_ROW_HEIGHT',rowHeight);
       }
     },
   
     mutations: {
       PUSH_FILE(state,file){
         let fileCopy = _.cloneDeep(file)
-        if(! _.has(fileCopy,"timestamps")){
+        if(! _.has(fileCopy,'timestamps')){
           fileCopy.timestamps = [];
         }
-        if(! _.has(fileCopy,"regions")){
+        if(! _.has(fileCopy,'regions')){
           fileCopy.regions = [];
         }
         state.musicFiles.push(fileCopy)
@@ -111,6 +115,10 @@ export default new Vuex.Store({
       },
       TOGGLE_SELECT_REMOVE(state){
         state.selectRemoveEnable = !state.selectRemoveEnable;
+      },
+      SET_ROW_HEIGHT(state,rowHeight){
+        state.rowHeight = rowHeight;
+        console.log(state.rowHeight);
       }
 
     },

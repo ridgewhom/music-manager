@@ -4,10 +4,9 @@
     <td class ="text-cell" @dblclick="openFileLocation">{{file.name}}</td>
     <td class ="text-cell">{{file.artist}}</td>
     <td class ="text-cell">{{file.genre}}</td>
-    <td class="slide-container"> 
-      <div class="buttons-div">
-        <!--Button class=playButton :class='{"paused": playing}' ref=playButton @click="playMusic"></Button--> 
-        <Button @click="playPreview" title="Preview">
+    <td class="slide-container" :style="{height: height+'px'}"> 
+      <div class="buttons-div" :style="{height: height+'px'}">
+        <Button @click="playPreview" :title="playingPreview ? 'Pause Preview' : 'Preview'">
           <div class="control-button" style=" ">
             {{playingPreview ? 'Pause Preview' : 'Play Preview'}}
             <font-awesome-icon :icon="playingPreview ? 'pause' : 'music'" size="2x"/>
@@ -25,7 +24,7 @@
           </div>
         </confirmation-button>
       </div>
-      <div id="waveform" ref = 'waveform'><div class="loading" v-if="loading">Loading {{loadingPercent}}%</div></div> 
+      <div id="waveform" ref = 'waveform' :style="{height: height+'px'}"><div class="loading" v-if="loading">Loading {{loadingPercent}}%</div></div> 
       <input type="range" title="Track Volume" orient="vertical" id=volume min="0" max="100" v-model="vol"/> </td>
   </tr>
   <tr v-else >
@@ -33,15 +32,13 @@
       <button @click="$emit('remove-track',file.path)">Remove Track</button>
       "{{file.name}}", was not found at "{{filePath}}" 
     </td> 
-    <!--
-    TODO: add button to select file here?
-    -->
+
   </tr>
   
 </template>
 
 <script>
-
+//Height has to be set on: waveform & slide-container, 
 
 
 import WaveSurfer from "wavesurfer.js";
@@ -77,6 +74,10 @@ export default {
     showCheckbox: {
       type: Boolean,
       default: false,
+    },
+    height: {
+      type: Number,
+      default: 128,
     }
   },
   data: function() {
@@ -97,7 +98,6 @@ export default {
         playingPreview: false,
         loading: true,
         loadingPercent: 0,
-        height: 128,
     }
   },
   mounted() {
@@ -119,7 +119,7 @@ export default {
         minPxPerSec: 0,
         responsive: true,
         cursorWidth: 1,
-        height: this.height,
+        height: this.height - 2,
         //hideScrollbar: true,
         //scrollParent: true,
         plugins: [
@@ -394,12 +394,14 @@ export default {
   .slide-container {
     display: grid;
     grid-template-columns: 94px 1fr 30px;
-    grid-template-rows: 120px;
+    margin: 0;
+    padding: 0;
     background: #3c3c3c;
   }
   .buttons-div {
     display: flex;
     flex-direction: column;
+    overflow:hidden;
   }
     
   input[type=range]{
@@ -459,13 +461,13 @@ export default {
     border-radius: 5px;
   }
 
-input[type='checkbox'] {
-    width:30px;
-    height:30px;
-    background:white;
-    border-radius:5px;
-    border:2px solid #555;
-}
+  input[type='checkbox'] {
+      width:30px;
+      height:30px;
+      background:white;
+      border-radius:5px;
+      border:2px solid #555;
+  }
 
 </style>
 
