@@ -1,11 +1,29 @@
 <template>
   <tr v-if='validPath'>
-    <td class ="text-cell" v-if="showCheckbox" @click="check"> <input type="checkbox" ref="checkbox" v-model="checked"> </td>
-    <td class ="text-cell" @dblclick="openFileLocation">{{file.name}}</td>
+    <td class ="text-cell" v-if="showCheckbox" @click="check"> <input type="checkbox" ref="checkbox" v-model="checked" > </td>
+    <td class ="text-cell" @dblclick="openFileLocation" :style="{'height' : height + 'px'}">
+      <div >{{file.name}}</div></td>
     <td class ="text-cell">{{file.artist}}</td>
     <td class ="text-cell">{{file.genre}}</td>
-    <td class="slide-container" :style="{height: height+'px'}"> 
-      <div class="buttons-div" :style="{height: height+'px'}">
+    <td class="slide-container" :style="{height: height+'px', 'grid-template-columns':'auto 1fr 20px'}"> 
+      <div v-if="height == 45" class="small-buttons-div" :style="{height: height+'px'}">
+        <Button @click="playPreview" :title="playingPreview ? 'Pause Preview' : 'Preview'">
+          <div class="control-button" style=" ">
+            <font-awesome-icon :icon="playingPreview ? 'pause' : 'music'" size="2x"/>
+          </div> 
+        </Button>
+        <Button @click="playMusic" :title = "playing ? 'Pause ' : 'Play'">
+          <div class="control-button" >
+            <font-awesome-icon :icon="playing ? 'pause' : 'play'"  size="2x"/>
+          </div>
+        </Button>
+        <confirmation-button @confirmation-accepted="clearRegions" message="Are you sure you want to clear ALL regions for this track?" title="Clear Regions">
+          <div class=control-button >
+            <font-awesome-icon icon="eraser" size="2x"/>
+          </div>
+        </confirmation-button>
+      </div>
+      <div v-else class="buttons-div" :style="{height: height+'px'}">
         <Button @click="playPreview" :title="playingPreview ? 'Pause Preview' : 'Preview'">
           <div class="control-button" style=" ">
             {{playingPreview ? 'Pause Preview' : 'Play Preview'}}
@@ -24,8 +42,11 @@
           </div>
         </confirmation-button>
       </div>
+
+
+
       <div id="waveform" ref = 'waveform' :style="{height: height+'px'}"><div class="loading" v-if="loading">Loading {{loadingPercent}}%</div></div> 
-      <input type="range" title="Track Volume" orient="vertical" id=volume min="0" max="100" v-model="vol"/> </td>
+      <input type="range" title="Track Volume" orient="vertical" id=volume min="0" max="100" v-model="vol" :style="{'height' : height + 'px'}"/> </td>
   </tr>
   <tr v-else >
     <td style='color:black; background-color:red;  grid-column: 1/-1; display: flex;'>
@@ -75,9 +96,13 @@ export default {
       type: Boolean,
       default: false,
     },
-    height: {
-      type: Number,
+    size: {
+      type: [Number, String],
       default: 128,
+      validator: (x) => x in ['Small','Large'] || typeof x === 'number'
+    },
+    progressColor: {
+      default: 'violet'
     }
   },
   data: function() {
@@ -86,7 +111,6 @@ export default {
         wavesurfer: null,
         songName: "",
         waveColor: "white",
-        progressColor: "violet",
         backgroundColor: "rgba(50,50,50,1)",
         percent: "30%",
         vol: 50,
@@ -204,16 +228,36 @@ export default {
               this.$emit('new-region-created',{newRegion: region, file: this.file})
               this.numRegions += 1;
       });
-      this.wavesurfer.on('region-dblclick',(region) => {
+      /*this.wavesurfer.on('region-dblclick',(region) => {
         console.log(region);
         region.play();
+      });*/
+      this.wavesurfer.on('region-contextmenu',(region) => { //right-click
+        this.removeRegion(region);
       });
 
     });
     
   },
   computed: { 
-
+    height: function() {
+      console.log('size = ' + this.size)
+      let height = 128;
+      if (typeof this.size === 'number')
+        height = this.size
+      else {
+        switch (this.size.toLowerCase()){
+          case 'large':
+            height = 128;
+            break;
+          case 'small':
+            height = 45;
+            break;
+        }
+        
+      }
+      return height;
+    },
     computedVolume: function () {
       return this.globalVolume * this.vol * .01;
     },
@@ -255,11 +299,10 @@ export default {
           this.playing = true;
           this.playingPreview = true;
 
-          console.log(this.sortedRegions);
           if(this.playingRegion < 0)
             this.playingRegion = 0;
           this.sortedRegions[this.playingRegion].play();
-          console.log('playing-region: ' + this.playingRegion)
+          //console.log('playing-region: ' + this.playingRegion)
           this.wavesurfer.on('region-out', this.playNextRegion);
         } else {
             remote.dialog.showMessageBox(null, {
@@ -273,23 +316,18 @@ export default {
     clearRegions(){
       this.wavesurfer.regions.clear();
       this.numRegions = 0;
-      console.log(this.wavesurfer.regions.list)
       this.$emit('clear-regions',this.file)
     },
-    removeRegion(){
-
-    },
-    playRegion(){
-
+    removeRegion(region){
+      region.remove();
+      this.$emit('region-remove',{region :region,file : this.file,});
     },
     playNextRegion(region){
-      console.log(this.sortedRegions.length)
-      console.log(this.playingRegion)
       if(region == this.sortedRegions[this.playingRegion])
         {
           if(this.playingRegion >= this.sortedRegions.length - 1){
               //end of Regions
-              console.log('end of regions')
+              //console.log('end of regions')
               this.playingRegion = -1;
               this.playing = false;
               this.playingPreview = false;
@@ -297,7 +335,6 @@ export default {
           } else {
           this.playingRegion += 1;
           this.sortedRegions[this.playingRegion].play();
-          console.log('playing-region: ' + this.playingRegion)
           }
         }
     },
@@ -333,12 +370,26 @@ export default {
         }
       });
       return readableInstanceStream;
+    },
+    redrawWaveform(){
+      if(this.wavesurfer){
+        this.$nextTick(()=> {
+          this.wavesurfer.setHeight(this.height - 2)
+          this.wavesurfer.drawBuffer();
+        });
+      }
     }
     
   },
   watch: {
+    progressColor: function(color){
+      this.wavesurfer.setProgressColor(color);
+    },
     computedVolume: function (newVol) {
       this.wavesurfer.setVolume(newVol);
+    },
+    height: function(){
+      this.redrawWaveform();
     },
     minPxPerSec: function(minPx) {
       this.wavesurfer.zoom(minPx);
@@ -354,11 +405,7 @@ export default {
       }
     },
     showCheckbox: function(){ //wavesurfer's responsive option doesn't respond to changes in CSS like adding/removing a grid column
-      if(this.wavesurfer){
-        this.$nextTick(()=> {
-          this.wavesurfer.drawBuffer();
-        });
-      }
+      this.redrawWaveform();
     }
   },
   beforeDestroy() {
@@ -374,6 +421,33 @@ export default {
   
   button {
     height: 100%;
+  }
+
+
+  .buttons-div {
+    display: flex;
+    flex-direction: column;
+    overflow:hidden;
+    justify-content: flex-start;
+    width: 110px;
+  }
+
+  .small-button-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100px;
+    overflow:hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  .small-button-div button {
+    display: flex;
+    flex-direction: row;
+    width: 50px;
+    overflow:hidden;
   }
 
   #waveform{ 
@@ -398,17 +472,14 @@ export default {
     padding: 0;
     background: #3c3c3c;
   }
-  .buttons-div {
-    display: flex;
-    flex-direction: column;
-    overflow:hidden;
-  }
+  
     
   input[type=range]{
     writing-mode: bt-lr; /* IE */
     -webkit-appearance: slider-vertical; /* WebKit */
+    /*-webkit-appearance: slider-horizontal; /* WebKit */
     margin: 0 0;
-    width: 30px;
+    width: 20px;
     
   }
   .control-button{
@@ -437,11 +508,25 @@ export default {
 
  
   .text-cell{
-    display:flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    max-height:128px;
+    overflow: ellipsis;
+  }
+
+  .text-cell div {
+    
+    text-align: center;
+    line-height: 20px;  
+    max-height: 100%;
+  } 
+
+
+
+  #waveform >>> ::-webkit-scrollbar
+  {
+    height: 10px;
   }
 
   #waveform >>> ::-webkit-scrollbar-track
@@ -467,6 +552,10 @@ export default {
       background:white;
       border-radius:5px;
       border:2px solid #555;
+  }
+
+  #waveform >>> .wavesurfer-handle {
+    z-index: 10;
   }
 
 </style>

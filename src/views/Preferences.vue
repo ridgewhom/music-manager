@@ -4,13 +4,16 @@
       <div class = "selector-div">
         Row/Waveform Height 
         <select v-model.number="rowHeight">
-          <option value="32">Small</option>
-          <option value="64">Medium</option>
+          <option value="45">Small</option>
           <option value="128">Large</option>
         </select>
       </div>
+      <div class = "selector-div">
+      Waveform Color
+        <open-window-button class="color-button" ipc-channel="showColorPicker" :style="{'background-color' : waveformProgressColor}"></open-window-button>
+      </div>
     </div>
-    <div style="background-color:white;">
+    <div class="apply-div">
       <div class = "selector-div">
         <Button @click="closeWindow">Cancel</Button>
         <Button @click="restoreDefaults">Restore Defaults</Button>
@@ -22,31 +25,51 @@
 
 <script>
 //import {mapState,mapActions} from 'vuex'
-import{ remote } from 'electron';
-import { ipcRenderer} from 'electron';
-
+import { ipcRenderer, remote} from 'electron';
+import OpenWindowButton from '../components/OpenWindowButton.vue';
 
 export default {
   name: 'Preferences',
   components: {
-
+    OpenWindowButton
   },
   data: function() {
     return {
       defaults: {rowHeight : 128},
-      rowHeight: this.$store.state.rowHeight
+      rowHeight: this.$store.state.rowHeight,
+      waveformProgressColor: this.$store.state.waveformProgressColor  
     }
+  },
+  created() {
+    ipcRenderer.on('preferences-update', this.handleIpcUpdate)
   },
   mounted(){
   },
   computed: {
     preferences: function(){
       return {
-        setRowHeight : this.rowHeight
+        setRowHeight : this.rowHeight,
+        setWaveformProgressColor: this.waveformProgressColor
       }
-    }
+    },
+   
   },
   methods: {
+      handleIpcUpdate(event,args){
+        for(let action in args){
+          switch(action) {
+            case 'setWaveformProgressColor':
+              this.setWaveformProgressColor(args[action])
+              break;
+            default:
+              console.log('action "' + action + '"')
+          }
+        }
+      },
+      setWaveformProgressColor(color){
+        this.waveformProgressColor = color;
+        //console.log(color);
+      },
       closeWindow(){
         remote.getCurrentWindow().close();
       },
@@ -65,17 +88,32 @@ export default {
 
 <style scoped>
 *, body{
-    background-color: #1e1e1e;
+    background-color: #222222;
     color: white;
     font-size: 24px;
+    height: 100%;
+}
+.apply-div {
+  background-color:blue; position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0; height: 30px;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-bottom: 15px;
 }
 .preferences{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height:100%;
-    background-color:red;
+    margin: 15px;
 }
+
+.preferences div {
+  margin-bottom: 5px;
+}
+
 .selector-div{
     display: flex;
     flex-direction: row;
@@ -91,6 +129,15 @@ button {
 button:hover {
     filter: brightness(150%);
     cursor:pointer;
+}
+.color-button{
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
 }
 
 </style>

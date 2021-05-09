@@ -1,5 +1,5 @@
 <template>
-  <button v-bind="$attrs" class=open-window-button @click="openWindow" >
+  <button v-bind="$attrs" @click="openWindow" >
     <slot></slot>
   </button>
 </template>
@@ -10,7 +10,7 @@ import {ipcRenderer} from 'electron';
 
 export default {
   inheritAttrs: false,
-  name: 'ConfirmationButton',
+  name: 'OpenWindowButton',
   components: {
   },
   props: {
@@ -29,22 +29,8 @@ export default {
     openWindow(){
       ipcRenderer.send(this.ipcChannel);
     },
-    confirmationAccepted(){
-      //console.log("ACCEPTED!");
-      this.$emit('confirmation-accepted')
-    },
   },
   computed: {
-    options: function(){
-      let options = {
-        type : this.type,
-        buttons: this.buttons,
-        defaultId: 0,
-        title: this.title,
-        message: this.message,
-        }
-      return options;
-    },
   }
 }
 

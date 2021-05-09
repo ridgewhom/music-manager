@@ -16,11 +16,15 @@
             :minPxPerSec= minPxPerSec
             :showCheckbox = showCheckboxes
             :checked = "checkedFilesToRemove.includes(file.path)"
+            :size = rowHeight
+            :progressColor = waveformProgressColor
             @new-region-created="createRegion"
             @clear-regions="clearRegions"
             @remove-track="removeFile"
             @checked-remove="trackChecked"
-            @unchecked-remove="trackUnChecked">
+            @unchecked-remove="trackUnChecked"
+            @region-remove="removeRegion"
+            >
           </tr>
         </tbody>
       </table>
@@ -53,7 +57,9 @@ export default {
         checkedFilesToRemove: [],
     }
   },
-  mounted() {},
+  mounted() {
+    console.log('rowHeight' + this.rowHeight)
+  },
   components: {
     MusicSlide,
     PageNavigator
@@ -66,6 +72,8 @@ export default {
       'musicFiles',
       'globalVolume',
       'minPxPerSec',
+      'rowHeight',
+      'waveformProgressColor'
     ]),
     ...mapState({
       showCheckboxes : 'selectRemoveEnable',
@@ -76,7 +84,7 @@ export default {
     
     sortedFiles: function(){
       let sorted = _.orderBy(this.filteredFiles,this.sortOrderArr,this.sortOrderAscOrDesc)
-      console.log('sorted = ' + sorted);
+      //console.log('sorted = ' + sorted);
       return sorted;
     },
     paginatedFiles: function(){
@@ -99,16 +107,16 @@ export default {
       this.endIdx = endIdx;
     },
     createRegion({newRegion,file}){
-      console.log(newRegion);
-      console.log(file);
+      //console.log(newRegion);
+      //console.log(file);
 
       //grab color, start, end from region
       //we don't really care about other properties, they can be left as defaults or are the same for all regions
       let color = newRegion.color;
       let start = newRegion.start;
       let end = newRegion.end;
-      console.log(newRegion.end)
-      console.log(color + ' ' + start + ' ' + end)
+      //console.log(newRegion.end)
+      //console.log(color + ' ' + start + ' ' + end)
 
       let region = {color: color, start: start, end: end}
       this.addRegion({region,file});
@@ -116,12 +124,12 @@ export default {
 
     },
     onHeaderClicked(header){
-      console.log(header)
+      //console.log(header)
       let idx = this.sortOrderArr.indexOf(header)
       if(idx == 0){
         
         this.$set(this.sortOrderAscOrDesc,0,(this.sortOrderAscOrDesc == 'asc') ? 'desc' : 'asc')
-        console.log(this.sortOrderAscOrDesc);
+        //console.log(this.sortOrderAscOrDesc);
       } else if (idx > 0){
         this.sortOrderArr.splice(idx,1);
         this.sortOrderArr.unshift(header);

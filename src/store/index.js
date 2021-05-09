@@ -19,9 +19,13 @@ export default new Vuex.Store({
       minPxPerSec: 0,
       selectRemoveEnable: false,
       rowHeight: 128,
+      waveformProgressColor: 'F9A057'
     },
   
     actions: {
+      setWaveformProgressColor(store,color){
+        store.commit('SET_WAVEFORM_PROGRESS_COLOR',color);
+      },
       pushFile(store,file){
         store.commit('PUSH_FILE',file);
       },
@@ -66,6 +70,9 @@ export default new Vuex.Store({
     },
   
     mutations: {
+      SET_WAVEFORM_PROGRESS_COLOR(state,color){
+        state.waveformProgressColor = color;
+      },
       PUSH_FILE(state,file){
         let fileCopy = _.cloneDeep(file)
         if(! _.has(fileCopy,'timestamps')){
@@ -107,7 +114,10 @@ export default new Vuex.Store({
       },
       // eslint-disable-next-line no-unused-vars
       REMOVE_REGION(state,{region,file}){      
-        //TODO: 
+        let regionArr = state.musicFiles.find(x => { return x.path == file.path}).regions
+        let index = regionArr.findIndex(x=> x.start == region.start && x.end == region.end)
+        regionArr.splice(index,1);
+
       },
       CLEAR_REGIONS(state,file){
         let regionArr = state.musicFiles.find(x => { return x.path == file.path}).regions
@@ -118,7 +128,6 @@ export default new Vuex.Store({
       },
       SET_ROW_HEIGHT(state,rowHeight){
         state.rowHeight = rowHeight;
-        console.log(state.rowHeight);
       }
 
     },

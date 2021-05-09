@@ -18,10 +18,10 @@ export default {
     Main,
     Toolbar,
   }, 
+  mounted() {
+  },
   methods: {
     updateFromIPC(event,arg){
-  
-
       for(let action in arg){
         this.$store.dispatch(action,arg[action])
       }
@@ -29,7 +29,8 @@ export default {
   },
   beforeDestroy(){
     ipcRenderer.removeListener('vuex-update',this.updateFromIPC)
-  }
+  },
+  
 }
 </script>
 
@@ -55,7 +56,7 @@ export default {
   padding:0;
 }
 
-button {
+ button {
   border: 1px solid rgba(90,90,90,1);
   background: #3c3c3c;
   color: lightgrey;
@@ -63,7 +64,7 @@ button {
   border-radius: 0px;
   font-size: 14px;
 }
-button:hover {
+  button:hover {
     filter: brightness(150%);
     cursor:pointer;
 }

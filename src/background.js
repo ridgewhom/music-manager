@@ -24,6 +24,8 @@ async function createWindow() {
   win = new BrowserWindow({
     width: 1280,
     height: 720,
+    minWidth :  560,
+    minHeight : 280,
     webPreferences: {
       enableRemoteModule: true,
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -98,6 +100,7 @@ let defaultWebPreferences = {
 }
 
 let preferencesWindow;
+let colorPickerwindow;
 
 ipcMain.on('showPreferences', function (e, data) {
   if(!preferencesWindow){
@@ -108,9 +111,11 @@ ipcMain.on('showPreferences', function (e, data) {
       width: 800, 
       height: 400, 
       webPreferences: defaultWebPreferences,
-      title: "Music-Manager Preferences",
-      parent: win
+      title: 'Music-Manager Preferences',
+      parent: win,
+      backgroundColor: '#222222',
     })
+    //preferencesWindow.removeMenu()
     preferencesWindow.on('closed', function () { 
       preferencesWindow = null 
     });
@@ -123,6 +128,40 @@ ipcMain.on('showPreferences', function (e, data) {
   else {
     preferencesWindow.show()
   }
+})
+
+
+ipcMain.on('showColorPicker', function (e, data) {
+  if(!colorPickerwindow){
+    const modalPath = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:8080/#/color-picker'
+      : `file://${__dirname}/index.html#color-picker`
+    colorPickerwindow = new BrowserWindow({ 
+      width: 519, 
+      height: 315, 
+      webPreferences: defaultWebPreferences,
+      title: 'Color Picker',
+      parent: preferencesWindow,
+      backgroundColor: '#222222',
+      //resizable: false,
+    })
+    //colorPickerwindow.removeMenu()
+    colorPickerwindow.on('closed', function () { 
+      colorPickerwindow = null 
+    });
+    colorPickerwindow.on('page-title-updated', function(e) {
+      e.preventDefault()
+    });
+    colorPickerwindow.loadURL(modalPath)
+
+  }
+  else {
+    colorPickerwindow.show()
+  }
+})
+
+ipcMain.on('preferences-update' , (event,arg) => {
+  preferencesWindow.send('preferences-update',arg)
 })
 
 ipcMain.on('vuex-update', (event, arg) => {

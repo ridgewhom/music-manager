@@ -1,29 +1,33 @@
 <template>
   <div id="nav-bar">
-    <div>Showing {{itemsDisplayedStart}} to {{itemsDisplayedEnd}} of {{totalItems}} </div>
-    <confirmation-button v-show="showRemoveButton" class="remove-files-button" @confirmation-accepted="$emit('remove-selected-files')">Remove Selected Files</confirmation-button>
+    <div style="display: flex; align-items: center;">Showing {{itemsDisplayedStart}} to {{itemsDisplayedEnd}} of {{totalItems}} </div>
+    <confirmation-button v-show="showRemoveButton" class="remove-files-button" @confirmation-accepted="$emit('remove-selected-files')"
+    style="display: flex-basis: 2">Remove Selected Files</confirmation-button>
     <div>
-      Show 
-      <select @change="resetPage" v-model.number="itemsPerPage" style="margin-right:5px; margin-left:5px;">
-        <option value=0>All</option>
-        <option value=5>5</option>
-        <option value=10 selected>10</option>
-        <option value=20>20</option>
-        <option value=30>30</option>
-        <option value=40>40</option>
-        <option value=50>50</option>
-      </select>
-      Music Tracks
+      <div style="display: flex; align-items: center;">
+        Show 
+        <select @change="resetPage" v-model.number="itemsPerPage" style="margin-right:5px; margin-left:5px; height: 100%;">
+          <option value=0>All</option>
+          <option value=5>5</option>
+          <option value=10>10</option>
+          <option value=20>20</option>
+          <option value=30>30</option>
+          <option value=40>40</option>
+          <option value=50>50</option>
+          <option value=100>100</option>
+        </select>
+        Music Tracks
+      </div>
+      <button :disabled="this.currentPage == 1" @click="goToFirstPage">First</button>
+      <button :disabled="this.currentPage == 1" @click="decrementPage" style="display:flex; align-items: center; justify-content: center;">
+        <font-awesome-icon icon="angle-left" size="2x"/>
+      </button>
+      <input class="page-input" min="1" :max="totalPages"  v-model="pageInput" :title="'Enter a Value between 1 and ' + {totalPages}"/>
+      <button :disabled="this.currentPage == this.totalPages" @click="incrementPage" style="display:flex; align-items: center; justify-content: center;">
+        <font-awesome-icon icon="angle-right" size="2x"/>
+      </button>
+      <button :disabled="this.currentPage == this.totalPages" @click="goToLastPage" >Last</button>
     </div>
-    <button :disabled="this.currentPage == 1" @click="goToFirstPage">First</button>
-    <button :disabled="this.currentPage == 1" @click="decrementPage" style="display:flex; align-items: center; justify-content: center;">
-      <font-awesome-icon icon="angle-left" size="2x"/>
-    </button>
-    <input class="page-input" min="1" :max="totalPages"  v-model="pageInput" :title="'Enter a Value between 1 and ' + {totalPages}"/>
-    <button :disabled="this.currentPage == this.totalPages" @click="incrementPage" style="display:flex; align-items: center; justify-content: center;">
-      <font-awesome-icon icon="angle-right" size="2x"/>
-    </button>
-    <button :disabled="this.currentPage == this.totalPages" @click="goToLastPage" >Last</button>
   </div>
 </template>
 
@@ -49,7 +53,7 @@ export default {
   },
   data: function() {
     return {
-      itemsPerPage: 10,
+      itemsPerPage: 20,
       currentPage: 1,
       pageInput: 1,
     }
@@ -132,13 +136,15 @@ export default {
     display:flex;
     flex-direction: row;
     align-items: stretch;
-    justify-content: flex-end;
+    justify-content: space-between;
+    
   }
   #nav-bar >>> div{
     display:flex;
     flex-direction: row;
     align-items: stretch;
     justify-content: flex-end;
+    
   }
   button:disabled{
     filter:brightness(.5);
