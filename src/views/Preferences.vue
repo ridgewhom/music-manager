@@ -35,7 +35,10 @@ export default {
   },
   data: function() {
     return {
-      defaults: {rowHeight : 128},
+      defaults: {
+        rowHeight : 128,
+        waveformProgressColor: '#F9A057'
+      },
       rowHeight: this.$store.state.rowHeight,
       waveformProgressColor: this.$store.state.waveformProgressColor  
     }
@@ -81,6 +84,7 @@ export default {
       },
       restoreDefaults(){
         this.rowHeight = this.defaults.rowHeight;
+        this.waveformProgressColor = this.defaults.waveformProgressColor;
       }
   }
 }

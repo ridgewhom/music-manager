@@ -19,7 +19,7 @@ export default new Vuex.Store({
       minPxPerSec: 0,
       selectRemoveEnable: false,
       rowHeight: 128,
-      waveformProgressColor: 'F9A057'
+      waveformProgressColor: '#F9A057'
     },
   
     actions: {

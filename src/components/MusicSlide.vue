@@ -554,9 +554,7 @@ export default {
       border:2px solid #555;
   }
 
-  #waveform >>> .wavesurfer-handle {
-    z-index: 10;
-  }
+ 
 
 </style>
 
