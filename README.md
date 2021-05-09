@@ -33,6 +33,6 @@ yarn electron:build
 ```
 
 ## Additional Images
-<img src="https://raw.githubusercontent.com/ridgewhom/music-manager/master/music-manager-alpha-img1.JPG" width=80%>
+<img src="https://raw.githubusercontent.com/ridgewhom/music-manager/master/music-manager-alpha-img2.JPG" width=80%>
 
 
